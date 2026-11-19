@@ -16,6 +16,7 @@ import { testMcp } from './mcp.ts';
 import { buildReport, reportAsCsv, REPORTS } from './reports.ts';
 import type { Runner } from './runner.ts';
 import { DIFF_SKIP, ENTITIES, now, type Actor, type Store } from './store.ts';
+import { COMMIT, STARTED_AT, VERSION } from './version.ts';
 import { acknowledge, listProblems, SEVERITIES, testMonitor, type Monitor, type Problem } from './zabbix.ts';
 
 export function hashPassword(pw: string): string {
@@ -56,7 +57,15 @@ export function buildApp(store: Store, runner: Runner): FastifyInstance {
     actors.set(req, { id: u.id, name: u.name || u.username });
   });
 
-  app.get('/api/public', async () => ({ corp: store.corp().name, demo: DEMO ? { username: 'demo', password: 'demo' } : null }));
+  app.get('/api/public', async () => ({ corp: store.corp().name, demo: DEMO ? { username: 'demo', password: 'demo' } : null, version: VERSION, commit: COMMIT }));
+
+  // Liveness for deploys and monitoring. No login, no instance data.
+  app.get('/health', async (_req, reply) => {
+    let dbOk = true;
+    try { db.select().from(schema.sessions).limit(1).all(); } catch { dbOk = false; }
+    return reply.code(dbOk ? 200 : 503).header('cache-control', 'no-store')
+      .send({ status: dbOk ? 'ok' : 'error', version: VERSION, commit: COMMIT, startedAt: STARTED_AT, uptimeS: Math.round(process.uptime()), db: dbOk ? 'ok' : 'error' });
+  });
 
   app.post('/api/auth/login', async (req, reply) => {
     const { username = '', password = '' } = (req.body ?? {}) as { username?: string; password?: string };
@@ -77,7 +86,7 @@ export function buildApp(store: Store, runner: Runner): FastifyInstance {
 
   app.get('/api/me', async (req) => ({
     user: store.public('users', store.get('users', actor(req).id!)), corp: store.corp(), engines: ENGINES, adapters: ADAPTERS.map((a) => ({ id: a.id, label: a.label })),
-    reports: REPORTS, ai: DEFAULT_AI, severities: SEVERITIES, version: '2.0.0-alpha.1',
+    reports: REPORTS, ai: DEFAULT_AI, severities: SEVERITIES, version: VERSION, commit: COMMIT,
   }));
 
   // ---------- corporation ----------

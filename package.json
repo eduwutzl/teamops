@@ -14,6 +14,9 @@
     "start": "tsx packages/server/src/index.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "node --import tsx --test packages/*/test/*.test.ts",
+    "db:migrate": "tsx packages/server/src/migrate.ts",
+    "db:backup": "node scripts/backup-db.mjs",
+    "deploy": "node scripts/deploy.mjs",
     "db:generate": "drizzle-kit generate --config packages/server/drizzle.config.ts",
     "seed:demo": "tsx packages/server/src/seed.ts"
   },

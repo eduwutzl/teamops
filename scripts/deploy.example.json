@@ -1,0 +1,26 @@
+{
+  "dev": "/path/to/teamops/app",
+  "remote": "origin",
+  "branch": "main",
+  "author": { "name": "TeamOps", "email": "teamops@localhost" },
+  "forbiddenTerms": "~/.config/teamops/forbidden-terms.txt",
+  "targets": [
+    {
+      "name": "example",
+      "label": "example (demo data)",
+      "app": "/path/to/example/app",
+      "instance": "/path/to/example/instance",
+      "service": "teamops-example.service",
+      "health": "http://127.0.0.1:8140/health"
+    },
+    {
+      "name": "official",
+      "ssh": "user@official-host",
+      "app": "/home/user/teamops/app",
+      "instance": "/home/user/teamops/instance",
+      "service": "teamops.service",
+      "health": "http://official-host:8140/health",
+      "keepBackups": 10
+    }
+  ]
+}

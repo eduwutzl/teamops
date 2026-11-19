@@ -114,13 +114,14 @@ function Shell({ me, onLogout }: { me: Me; onLogout: () => void }) {
           <Route path="/historico" element={<HistoryPage />} />
           <Route path="*" element={<Home />} />
         </Routes>
+        <footer className="no-print mt-10 border-t pt-4 text-xs text-muted-foreground">TeamOps v{me.version} · <span className="font-mono">{me.commit}</span></footer>
       </main>
     </div>
   );
 }
 
 function Login({ onDone }: { onDone: () => void }) {
-  const [pub, setPub] = React.useState<{ corp: string; demo: { username: string; password: string } | null } | null>(null);
+  const [pub, setPub] = React.useState<{ corp: string; demo: { username: string; password: string } | null; version?: string; commit?: string } | null>(null);
   const [username, setU] = React.useState('');
   const [password, setP] = React.useState('');
   const [error, setError] = React.useState('');
@@ -155,6 +156,7 @@ function Login({ onDone }: { onDone: () => void }) {
             <Button variant="outline" size="sm" className="mt-3" disabled={busy} onClick={() => submit(pub.demo!.username, pub.demo!.password)}>Entrar como demo</Button>
           </div>
         )}
+        {pub?.version && <p className="text-center text-xs text-muted-foreground">TeamOps v{pub.version} · <span className="font-mono">{pub.commit}</span></p>}
       </div>
     </div>
   );

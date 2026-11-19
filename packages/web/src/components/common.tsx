@@ -16,6 +16,7 @@ export interface Me {
   ai: { engine: string; model: string };
   severities: string[];
   version: string;
+  commit: string;
 }
 export const AppContext = React.createContext<{ me: Me; refreshMe: () => void; toast: (text: string, tone?: 'ok' | 'crit') => void }>(null as never);
 export const useApp = () => React.useContext(AppContext);

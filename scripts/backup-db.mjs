@@ -43,7 +43,11 @@ const out = join(dir, `${label}-${stamp()}.sqlite`);
 const tmp = `${out}.tmp`;
 const db = new Database(dbFile, { fileMustExist: true });
 try { db.pragma('busy_timeout = 5000'); await db.backup(tmp); } finally { db.close(); }
+// The copy inherits WAL mode: turn it into a single self-contained file before publishing it.
+const copy = new Database(tmp);
+try { copy.pragma('journal_mode = DELETE'); } finally { copy.close(); }
 check(tmp);
+for (const ext of ['-wal', '-shm']) rmSync(tmp + ext, { force: true });
 renameSync(tmp, out);
 
 const mine = readdirSync(dir).filter((f) => f.startsWith(`${label}-`) && f.endsWith('.sqlite')).sort();

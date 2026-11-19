@@ -97,8 +97,9 @@ const prelude = (t) => `set -euo pipefail
 export XDG_RUNTIME_DIR="\${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
 ${t.path ? `export PATH=${q(t.path)}:"$PATH"` : ''}
 export TEAMOPS_INSTANCE=${q(t.instance)}
-cd ${q(t.app)}
 step() { echo "@@STEP $*"; }
+step "abrir a pasta do setup"
+cd ${q(t.app)}
 `;
 function onTarget(t, script) {
   const full = prelude(t) + script;
